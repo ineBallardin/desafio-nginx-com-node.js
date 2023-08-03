@@ -13,7 +13,9 @@ services:
     entrypoint: sh -c "npm install && node index.js"
     tty: true
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    
 
   nginx:
     image: nginx
@@ -40,6 +42,11 @@ services:
       MYSQL_DATABASE: nodedb
     networks:
       - nginxcomnode-network
+    healthcheck:
+      test: "/usr/bin/mysql --user=root --password=root --execute \"SHOW DATABASES;\""
+      interval: 2s
+      timeout: 20s
+      retries: 10
 
 networks:
   nginxcomnode-network:
